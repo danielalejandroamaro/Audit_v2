@@ -32,9 +32,11 @@ class RulersGenerator(models.Model):
             'res_model': 'ruler.wizard',
             'type': 'ir.actions.act_window',
             'target': 'new',
-            'context': {'default_ruler_generator_id': self.id,
-                        'default_ruler_type': 'ruler',
-                        },
+            'context': {
+                'default_ruler_generator_id': self.id,
+                'default_ruler_type': 'ruler',
+                'ruler_operation': 'add'
+            },
             'nodestroy': True,
         }
 

@@ -108,72 +108,46 @@ class Rulers(models.Model):
 
     @api.multi
     def edit(self):
-        fields_type = self.fields_type.encode('ascii', 'ignore')
-        #
-        # ruler_values = {
-        #     'date': self.date_value,
-        #     'datetime': self.date_time_value,
-        #     'integer': self.integer_value,
-        #     'boolean': self.bool_value,
-        #     'char': self.char_value,
-        #     'float': self.float_value,
-        #     'monetary': self.date_value,
-        #     'many2many': self.date_value,
-        #     'many2one': self.many2many_value,
-        #     'selection': self.many2many_value,
-        # }
-        #
-        # ruler_value = ruler_values[fields_type]
 
-        #     if fields_type == 'date':
-        #         ruler["date_value"] = self.date_value
-        #
-        #     elif fields_type == 'datetime':
-        #         ruler["date_time_value"] = self.date_time_value
-        #
-        #     elif fields_type == 'integer':
-        #         ruler["integer_value"] = self.integer_value
-        #
-        #     elif fields_type == 'boolean':
-        #         ruler["bool_value"] = self.bool_value
-        #
-        #     elif fields_type == 'char':
-        #         ruler["char_value"] = self.char_value
-        #
-        #     elif fields_type in ['float', 'monetary']:
-        #         ruler["float_value"] = self.float_value
-        #
-        #     elif fields_type in [' many2many', 'many2one']:
-        #         ruler["many2many_value"] = self.many2many_value
-        # else:
-        #     return False
+        fields_type = self.fields_type
 
-        ruler_wizard = self.env['ruler.wizard'].create(
-            {
-                'name': "Temp Name!!",
-                'generator_id': self.ruler_generator_id.id,
-                'ruler_model': self.ruler_model.id,
-                'ruler_field': self.ruler_field.id,
-                'ruler_type': self.ruler_type,
-                'logical_operator': self.logical_operator.id,
-                'fields_type': self.fields_type,
-                'date_value': self.date_value,
-                'integer_value': self.integer_value,
-                'bool_value': self.bool_value,
-                'char_value': self.char_value,
-                'float_value': self.float_value,
-                'many2many_value': self.many2many_value.ids,
-            }
-        )
+        context = {
+            'default_name': self.name,
+            'default_ruler_generator_id': self.ruler_generator_id.id,
+            'default_ruler_model': self.ruler_model.id,
+            'default_ruler_field': self.ruler_field.id,
+            'default_ruler_type': self.ruler_type,
+            'default_logical_operator': self.logical_operator.id,
+            'ruler_operation': 'edit'
+        }
+
+        if fields_type == 'date':
+            context['default_date_value'] = self.date_value
+
+        elif fields_type == 'datetime':
+            context
+        elif fields_type == 'integer':
+            context['default_integer_value'] = self.integer_value
+
+        elif fields_type == 'boolean':
+            context['default_bool_value'] = self.bool_value
+
+        elif fields_type == 'char':
+            context['default_char_value'] = self.char_value
+
+        elif fields_type in ['float', 'monetary']:
+            context['default_float_value'] = self.float_value
+
+        elif fields_type in ['many2many', 'many2one']:
+            context['default_many2many_value'] = self.many2many_value
 
         return {
             'view_type': 'form',
             'view_mode': 'form',
-            'res_model': 'rule.wizard',
-            'res_id': ruler_wizard.id,
+            'res_model': 'ruler.wizard',
             'type': 'ir.actions.act_window',
             'target': 'new',
-            'context': {'default_ruler_wizard': self.id, },
+            'context': context,
             'nodestroy': True,
         }
 

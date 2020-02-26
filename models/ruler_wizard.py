@@ -15,7 +15,6 @@ class RulerWizard(models.TransientModel):
     @api.onchange('ruler_field')
     def onchange_method(self):
 
-
         if self.fields_type:
             self.fields_type = self.ruler_field.ttype
 
@@ -43,7 +42,7 @@ class RulerWizard(models.TransientModel):
                         )
 
                         transient_ids.append(transient.id)
-                else: # 'many2many', 'many2one'
+                else:  # 'many2many', 'many2one'
 
                     ruler_model = self.ruler_field.relation  # esto es el modelo
                     records = self.env[ruler_model].search([])
@@ -63,13 +62,8 @@ class RulerWizard(models.TransientModel):
     @api.multi
     def create_ruler(self):
 
-        context = self.env.context
-        ruler_generator_id = self.ruler_generator_id
-
-        fields_type = self.fields_type
-
         ruler = {
-            'generator_id': ruler_generator_id,
+            'generator_id': self.ruler_generator_id,
             'ruler_model': self.ruler_model.id,
             'ruler_field': self.ruler_field.id,
             'ruler_type': self.ruler_type,
@@ -77,47 +71,69 @@ class RulerWizard(models.TransientModel):
             'fields_type': self.fields_type,
         }
 
-        if context and ruler_generator_id:
-            if fields_type == 'date':
-                ruler['date_value'] = self.date_value
-                selected_value = self.date_value
+        fields_type = self.fields_type
 
-            elif fields_type == 'datetime':
-                ruler['datetime'] = self.date_time_value
-                selected_value = self.date_time_value
+        if fields_type == 'date':
+            ruler['date_value'] = self.date_value
+            selected_value = self.date_value
 
-            elif fields_type == 'integer':
-                ruler['integer_value'] = str(self.integer_value)
-                selected_value = str(self.integer_value)
+        elif fields_type == 'datetime':
+            ruler['datetime'] = self.date_time_value
+            selected_value = self.date_time_value
 
-            elif fields_type == 'boolean':
-                ruler['bool_value'] = self.bool_value
+        elif fields_type == 'integer':
+            ruler['integer_value'] = str(self.integer_value)
+            selected_value = str(self.integer_value)
 
-                if fields_type == "True":
-                    selected_value = "Verdadero"
-                else:
-                    selected_value = "Falso"
+        elif fields_type == 'boolean':
+            ruler['bool_value'] = self.bool_value
 
-            elif fields_type == 'char':
-                ruler['char_value'] = self.char_value
-                selected_value = self.char_value
-
-            elif fields_type in ['float', 'monetary']:
-                ruler['float_value'] = str(self.float_value)
-                selected_value = str(self.float_value)
-
-            elif fields_type in [' many2many', 'many2one']:
-                ruler['many2many_value'] = str(self.many2many_value)
-                selected_value = self.many2many_value.name
-
+            if fields_type == "True":
+                selected_value = "Verdadero"
             else:
-                return False
+                selected_value = "Falso"
 
-            name = "Del el Modelo: " + self.ruler_model.name + \
-                   ", El campo: " + self.ruler_field.name + \
-                   " " + self.logical_operator.name + \
-                   " " + selected_value
+        elif fields_type == 'char':
+            ruler['char_value'] = self.char_value
+            selected_value = self.char_value
 
-            ruler['name'] = name
+        elif fields_type in ['float', 'monetary']:
+            ruler['float_value'] = str(self.float_value)
+            selected_value = str(self.float_value)
 
+        elif fields_type in [' many2many', 'many2one']:
+            ruler['many2many_value'] = str(self.many2many_value)
+            selected_value = self.many2many_value.name
+
+        else:
+            return False
+
+        name = "Del el Modelo: " + self.ruler_model.name + \
+               ", El campo: " + self.ruler_field.name + \
+               " " + self.logical_operator.name + \
+               " " + selected_value
+
+        ruler['name'] = name
+
+        ######################## Debug #################################
+        import sys
+        sys.path.append("/usr/lib/python2.7/debug/pydevd-pycharm.egg")
+        import pydevd_pycharm
+        pydevd_pycharm.settrace(
+            '10.0.75.1',
+            port=4020,
+            stdoutToServer=True,
+            stderrToServer=True,
+        )
+        ######################## Debug #################################
+
+        context = self.env.context
+        if context and context.get('ruler_operation', False) == 'add':
             self.env['rulers'].create(ruler)
+
+        # elif context and context.get('ruler_operation', False)== 'edit':
+        #     self.env['rulers'].browse(stringconverter).write(ruler)
+
+
+
+
