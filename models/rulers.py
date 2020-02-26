@@ -118,7 +118,8 @@ class Rulers(models.Model):
             'default_ruler_field': self.ruler_field.id,
             'default_ruler_type': self.ruler_type,
             'default_logical_operator': self.logical_operator.id,
-            'ruler_operation': 'edit'
+            'ruler_operation': 'edit',
+            'ruler_id': self.id,
         }
 
         if fields_type == 'date':

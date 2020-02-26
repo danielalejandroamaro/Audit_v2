@@ -128,11 +128,12 @@ class RulerWizard(models.TransientModel):
         ######################## Debug #################################
 
         context = self.env.context
+        ruler_id = context.get('ruler_id', False)
         if context and context.get('ruler_operation', False) == 'add':
             self.env['rulers'].create(ruler)
 
-        # elif context and context.get('ruler_operation', False)== 'edit':
-        #     self.env['rulers'].browse(stringconverter).write(ruler)
+        elif context and context.get('ruler_operation', False)== 'edit':
+            self.env['rulers'].browse(ruler_id).write(ruler)
 
 
 
